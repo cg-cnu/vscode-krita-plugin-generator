@@ -1,0 +1,39 @@
+{
+    "name": "vscode-krita-extension-templates",
+    "displayName": "vscode-krita-extension-templates",
+    "description": "create krita extension templates from vscode",
+    "version": "0.0.1",
+    "publisher": "cg-cnu",
+    "engines": {
+        "vscode": "^1.21.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:krita.create"
+    ],
+    "main": "./out/krita",
+    "contributes": {
+        "commands": [
+            {
+                "command": "krita.create",
+                "title": "Krita Extension Template"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "tslint": "^5.8.0",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    }
+}

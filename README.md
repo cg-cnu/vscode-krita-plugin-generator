@@ -1,0 +1,1 @@
+# vscode-krita-script-generator
