@@ -1,5 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
+import * as templates from "./templates"
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(
