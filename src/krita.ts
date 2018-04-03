@@ -4,7 +4,6 @@ import { writeFileSync, existsSync, lstatSync, readFileSync } from "fs";
 import { join } from "path";
 import * as mkdf from "node-mkdirfilep";
 
-
 function capitalizeFirstLetter(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
@@ -16,6 +15,7 @@ function getTemplate(fileName: string) {
 
 export function activate(context: vscode.ExtensionContext) {
   let create = vscode.commands.registerCommand("krita.create", () => {
+    // plugin_path
     vscode.window
       .showInputBox({
         ignoreFocusOut: true,
@@ -34,7 +34,8 @@ export function activate(context: vscode.ExtensionContext) {
           );
           return;
         }
-        // get script name...
+
+        // plugin_name
         vscode.window
           .showInputBox({
             ignoreFocusOut: true,
@@ -51,13 +52,14 @@ export function activate(context: vscode.ExtensionContext) {
                 `Plugin name changed from '${orig_plugin_name}' to '${plugin_name}'`
               );
             }
-            // make sure that path dosen't contain the script name already
             if (existsSync(join(plugin_path, plugin_name))) {
               vscode.window.showErrorMessage(
                 `A plugin already exists in the path '${plugin_path}' with name '${plugin_name}'`
               );
               return;
             }
+
+            // plugin_comment
             vscode.window
               .showInputBox({
                 ignoreFocusOut: true,
@@ -71,6 +73,8 @@ export function activate(context: vscode.ExtensionContext) {
                     `No plugin comment given. Defaulting to plugin name '${plugin_name}'`
                   );
                 }
+
+                // menu_entry
                 vscode.window
                   .showInputBox({
                     ignoreFocusOut: true,
@@ -84,6 +88,8 @@ export function activate(context: vscode.ExtensionContext) {
                         `No menu entry given. Defaulting to plugin name '${plugin_name}'`
                       );
                     }
+
+                    // plugin_types
                     const plugin_types = ["Extension", "Docker"];
                     vscode.window
                       .showQuickPick(plugin_types, {
@@ -91,16 +97,19 @@ export function activate(context: vscode.ExtensionContext) {
                       })
                       .then(plugin_type => {
                         if (!plugin_type) {
-                          plugin_type = "Extension";
                           vscode.window.showInformationMessage(
                             "No plugin type choosen. Defaulting to Extension!"
                           );
                         }
+                        const plugin = plugin_type
+                          ? plugin_type.toLowerCase()
+                          : "extension";
                         const class_name = capitalizeFirstLetter(plugin_name);
 
-                        let  plugin_template = eval(
-                            "`" + getTemplate(`${plugin_type.toLowerCase()}.py`) + "`"
-                          );
+                        // Get templates
+                        let plugin_template = eval(
+                          "`" + getTemplate(`${plugin}.py`) + "`"
+                        );
                         let desktop_template = eval(
                           "`" + getTemplate("script.desktop") + "`"
                         );
@@ -109,6 +118,7 @@ export function activate(context: vscode.ExtensionContext) {
                         );
                         let init_template = `from .${plugin_name} import *`;
 
+                        // Write templates
                         const desktop_file = join(
                           plugin_path,
                           `${plugin_name}.desktop`
