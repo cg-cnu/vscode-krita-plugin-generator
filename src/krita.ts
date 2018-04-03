@@ -1,7 +1,8 @@
 "use strict";
 import * as vscode from "vscode";
-import { writeFileSync } from "fs";
+import { writeFileSync, existsSync, lstatSync } from "fs";
 import { join } from "path";
+import * as mkdf from "node-mkdirfilep";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(
@@ -12,38 +13,60 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window
       .showInputBox({
         ignoreFocusOut: true,
-        placeHolder: "Name here...",
-        prompt: "Enter the name of the script"
+        placeHolder: "Path...",
+        prompt: "Enter the path where the extension has to be created"
       })
-      .then(script_name => {
-        // TODO: created by salapati @ 2018-4-3 11:46:43
-        // format name to not have special characters and spaces
+      .then(script_path => {
+        if (!script_path) {
+          return;
+        }
+        // TODO: created by salapati @ 2018-4-3 15:26:34
+        // make sure the path is valid
+        if (!existsSync(script_path) || !lstatSync(script_path).isDirectory()) {
+          vscode.window.showErrorMessage(
+            `Given directory '${script_path}' dosen't exist!`
+          );
+          return;
+        }
+        // get script name...
         vscode.window
           .showInputBox({
             ignoreFocusOut: true,
-            placeHolder: "Description here...",
-            prompt: `Enter the descriptions for the script `
+            placeHolder: "Name here...",
+            prompt: "Enter the name of the script"
           })
-          .then(script_comment => {
-            // TODO: created by salapati @ 2018-4-3 11:49:18
-            // if descript is none create a dummy description
+          .then(script_name => {
+            if (!script_name) {
+              return;
+            }
+            var script_name = script_name.replace(/[^a-zA-Z ]/g, "");
+            // make sure that path dosen't contain the script name already
+            if (existsSync(join(script_path, script_name))) {
+              vscode.window.showErrorMessage(
+                `A script file already exists in the path '${script_path}'`
+              );
+              return;
+            }
             vscode.window
               .showInputBox({
                 ignoreFocusOut: true,
-                placeHolder: "Menu entry here...",
-                prompt: "Enter the menu entry of the script"
+                placeHolder: "Description here...",
+                prompt: `Enter the descriptions for the script `
               })
-              .then(menu_entry => {
-                // TODO: created by salapati @ 2018-4-3 11:48:56
-                // if menu entry is none make script name as entry
+              .then(script_comment => {
+                if (!script_comment) {
+                  script_comment = script_name;
+                }
                 vscode.window
                   .showInputBox({
                     ignoreFocusOut: true,
-                    placeHolder: "Path...",
-                    prompt:
-                      "Enter the path where the extension has to be created"
+                    placeHolder: "Menu entry here...",
+                    prompt: "Enter the menu entry of the script"
                   })
-                  .then(script_path => {
+                  .then(menu_entry => {
+                    if (!menu_entry) {
+                      menu_entry = script_name;
+                    }
                     const scriptTypes = ["Extension", "Docker"];
                     vscode.window
                       .showQuickPick(scriptTypes)
@@ -125,12 +148,23 @@ Tell people how to use your script here.
 
 </body>
 </html>`;
-                        // Create .desktop file
+                        //create .desktop file...
+                        mkdf.create(
+                          join(`${script_path}`, `${script_name}.desktop`)
+                        );
+                        // write contents...
                         writeFileSync(
                           join(`${script_path}`, `${script_name}.desktop`),
                           DESKTOP_TEMPLATE
                         );
-
+                        // create main script file...
+                        mkdf.create(
+                          join(
+                            `${script_path}`,
+                            `${script_name}`,
+                            `${script_name}.py`
+                          )
+                        );
                         // write files to disk
                         writeFileSync(
                           join(
@@ -140,7 +174,14 @@ Tell people how to use your script here.
                           ),
                           script_template
                         );
-
+                        // Create __init__.py file...
+                        mkdf.create(
+                          join(
+                            `${script_path}`,
+                            `${script_name}`,
+                            "__init__.py"
+                          )
+                        );
                         writeFileSync(
                           join(
                             `${script_path}`,
@@ -149,7 +190,14 @@ Tell people how to use your script here.
                           ),
                           INIT_TEMPLATE
                         );
-
+                        // Create manual.html file...
+                        mkdf.create(
+                          join(
+                            `${script_path}`,
+                            `${script_name}`,
+                            "/manual.html"
+                          )
+                        );
                         writeFileSync(
                           join(
                             `${script_path}`,
@@ -157,6 +205,9 @@ Tell people how to use your script here.
                             "/manual.html"
                           ),
                           MANUAL_TEMPLATE
+                        );
+                        vscode.window.showInformationMessage(
+                          `Krita script ${script_name} successfully created at ${script_path}`
                         );
                       });
                   });
