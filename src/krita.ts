@@ -13,6 +13,18 @@ function getTemplate(fileName: string) {
   return readFileSync(join(template_path, fileName), "utf8");
 }
 
+function openCode(path: string, newWindow: boolean) {
+  if (existsSync(path)) {
+    let repoUri: vscode.Uri = vscode.Uri.parse(path);
+    vscode.commands
+      .executeCommand("vscode.openFolder", repoUri, newWindow)
+      .then(
+        value => console.log(value),
+        value => vscode.window.showWarningMessage("Error opening the plugin!")
+      );
+  }
+}
+
 export function activate(context: vscode.ExtensionContext) {
   let create = vscode.commands.registerCommand("krita.create", () => {
     // plugin_path
@@ -143,17 +155,24 @@ export function activate(context: vscode.ExtensionContext) {
                         vscode.window.showInformationMessage(
                           `Krita script ${plugin_name} successfully created at ${folder}`
                         );
-                        // IDEA: logged by salapati @ 2018-4-3 15:55:57
-                        // prompt to open folder on completion
-                        // vscode.window
-                        //   .showQuickPick([
-                        //     `open ${plugin_name} in current window`,
-                        //     `open ${plugin_name} in new window`,
-                        //     "Don't open!"
-                        //   ])
-                        //   .then(choice => {
-                        //     console.log(choice);
-                        //   });
+
+                        // Open plugin
+                        vscode.window
+                          .showQuickPick([
+                            "open in current window",
+                            "open in new window"
+                          ])
+                          .then(choice => {
+                            if (!choice) {
+                              return;
+                            }
+                            if (choice === "open in current window") {
+                              openCode(folder, false);
+                            }
+                            if (choice === "open in new window") {
+                              openCode(folder, false);
+                            }
+                          });
                       });
                   });
               });
