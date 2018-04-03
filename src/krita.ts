@@ -1,14 +1,20 @@
 "use strict";
 import * as vscode from "vscode";
-import { writeFileSync, existsSync, lstatSync } from "fs";
+import { writeFileSync, existsSync, lstatSync, readFileSync } from "fs";
 import { join } from "path";
 import * as mkdf from "node-mkdirfilep";
 
-export function activate(context: vscode.ExtensionContext) {
-  console.log(
-    'Congratulations, your extension "vscode-krita-plugin-generator" is now active!'
-  );
 
+function capitalizeFirstLetter(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function getTemplate(fileName: string) {
+  const template_path = join(__dirname, "..", "src", "templates");
+  return readFileSync(join(template_path, fileName), "utf8");
+}
+
+export function activate(context: vscode.ExtensionContext) {
   let create = vscode.commands.registerCommand("krita.create", () => {
     vscode.window
       .showInputBox({
@@ -21,7 +27,7 @@ export function activate(context: vscode.ExtensionContext) {
           return;
         }
         // TODO: created by salapati @ 2018-4-3 15:26:34
-        // make sure the path is valid
+        // save the pugin path and prefill next time!
         if (!existsSync(plugin_path) || !lstatSync(plugin_path).isDirectory()) {
           vscode.window.showErrorMessage(
             `Given directory '${plugin_path}' dosen't exist!`
@@ -35,15 +41,20 @@ export function activate(context: vscode.ExtensionContext) {
             placeHolder: "Name here...",
             prompt: "Enter the name of the plugin!"
           })
-          .then(plugin_name => {
-            if (!plugin_name) {
+          .then(orig_plugin_name => {
+            if (!orig_plugin_name) {
               return;
             }
-            var plugin_name = plugin_name.replace(/[^a-zA-Z ]/g, "");
+            var plugin_name = orig_plugin_name.replace(/[^a-zA-Z0-9]/g, "");
+            if (orig_plugin_name !== plugin_name) {
+              vscode.window.showInformationMessage(
+                `Plugin name changed from '${orig_plugin_name}' to '${plugin_name}'`
+              );
+            }
             // make sure that path dosen't contain the script name already
             if (existsSync(join(plugin_path, plugin_name))) {
               vscode.window.showErrorMessage(
-                `A plugin already exists in the path '${plugin_path}'`
+                `A plugin already exists in the path '${plugin_path}' with name '${plugin_name}'`
               );
               return;
             }
@@ -51,166 +62,88 @@ export function activate(context: vscode.ExtensionContext) {
               .showInputBox({
                 ignoreFocusOut: true,
                 placeHolder: "Description here...",
-                prompt: `Enter the descriptions for the plugin!`
+                prompt: `(optional) Enter the descriptions for the plugin!`
               })
               .then(plugin_comment => {
                 if (!plugin_comment) {
                   plugin_comment = plugin_name;
+                  vscode.window.showInformationMessage(
+                    `No plugin comment given. Defaulting to plugin name '${plugin_name}'`
+                  );
                 }
                 vscode.window
                   .showInputBox({
                     ignoreFocusOut: true,
                     placeHolder: "Menu entry here...",
-                    prompt: "Enter the menu entry of the plugin!"
+                    prompt: "(optional) Enter the menu entry of the plugin!"
                   })
                   .then(menu_entry => {
                     if (!menu_entry) {
                       menu_entry = plugin_name;
+                      vscode.window.showInformationMessage(
+                        `No menu entry given. Defaulting to plugin name '${plugin_name}'`
+                      );
                     }
                     const plugin_types = ["Extension", "Docker"];
                     vscode.window
-                      .showQuickPick(plugin_types)
+                      .showQuickPick(plugin_types, {
+                        ignoreFocusOut: true
+                      })
                       .then(plugin_type => {
-                        // const class_name = plugin_name.upper();
-                        const class_name = plugin_name;
-                        var plugin_template = "";
-                        if (plugin_type === "Extension") {
-                          plugin_template = `from krita import Extension
-
-EXTENSION_ID = 'pykrita_${plugin_name}'
-MENU_ENTRY = '${menu_entry}'
-
-class ${class_name}(Extension):
-
-    def __init__(self, parent):
-        super().__init__(parent)
-
-    def setup(self):
-        app = Krita.instance()
-        action = app.createAction(EXTENSION_ID, MENU_ENTRY)
-        # parameter 1 =  the name that Krita uses to identify the action
-        # parameter 2 = the text to be added to the menu entry for this script
-        action.triggered.connect(self.action_triggered)
-        
-    def action_triggered(self):
-        pass # your active code goes here. 
-
-# And add the extension to Krita's list of extensions:
-app=Krita.instance()
-extension=${class_name}(parent=app) #instantiate your class
-app.addExtension(extension)`;
+                        if (!plugin_type) {
+                          plugin_type = "Extension";
+                          vscode.window.showInformationMessage(
+                            "No plugin type choosen. Defaulting to Extension!"
+                          );
                         }
-                        if (plugin_type === "Docker") {
-                          plugin_template = `from krita import DockWidget, DockWidgetFactory, DockWidgetFactoryBase
+                        const class_name = capitalizeFirstLetter(plugin_name);
 
-DOCKER_NAME = '${plugin_name}'
-DOCKER_ID = 'pyKrita_${plugin_name}'
-
-class ${class_name}(DockWidget):
-
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle(DOCKER_NAME) 
-
-    def canvasChanged(self, canvas):
-        pass
-
-instance = Krita.instance()
-dock_widget_factory = DockWidgetFactory(DOCKER_ID, 
-    DockWidgetFactoryBase.DockRight, 
-    ${class_name})
-
-instance.addDockWidgetFactory(dock_widget_factory)`;
-                        }
-                        let DESKTOP_TEMPLATE = `[Desktop Entry]
-Type=Service
-ServiceTypes=Krita/PythonPlugin
-X-KDE-Library=${plugin_name}
-X-Python-2-Compatible=false
-X-Krita-Manual=manual.html
-Name=${plugin_name}
-Comment=${plugin_comment}`;
-
-                        let INIT_TEMPLATE = `from .${plugin_name} import *`;
-
-                        let MANUAL_TEMPLATE = `<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<!--BBD's Krita Script Starter, Feb 2018 -->
-<head><title>${plugin_name}</title>
-</head>
-<body>
-<h3>${plugin_name}</h3>
-Tell people about what your script does here. This is an html document so you can format it with html tags.
-<h3>Usage</h3>
-Tell people how to use your script here. 
-
-</body>
-</html>`;
-                        //create .desktop file...
-                        mkdf.create(
-                          join(`${plugin_path}`, `${plugin_name}.desktop`)
+                        let  plugin_template = eval(
+                            "`" + getTemplate(`${plugin_type.toLowerCase()}.py`) + "`"
+                          );
+                        let desktop_template = eval(
+                          "`" + getTemplate("script.desktop") + "`"
                         );
-                        // write contents...
-                        writeFileSync(
-                          join(`${plugin_path}`, `${plugin_name}.desktop`),
-                          DESKTOP_TEMPLATE
+                        let manual_template = eval(
+                          "`" + getTemplate("manual.html") + "`"
                         );
-                        // create main script file...
-                        mkdf.create(
-                          join(
-                            `${plugin_path}`,
-                            `${plugin_name}`,
-                            `${plugin_name}.py`
-                          )
+                        let init_template = `from .${plugin_name} import *`;
+
+                        const desktop_file = join(
+                          plugin_path,
+                          `${plugin_name}.desktop`
                         );
-                        // write files to disk
-                        writeFileSync(
-                          join(
-                            `${plugin_path}`,
-                            `${plugin_name}`,
-                            `${plugin_name}.py`
-                          ),
-                          plugin_template
-                        );
-                        // Create __init__.py file...
-                        mkdf.create(
-                          join(
-                            `${plugin_path}`,
-                            `${plugin_name}`,
-                            "__init__.py"
-                          )
-                        );
-                        writeFileSync(
-                          join(
-                            `${plugin_path}`,
-                            `${plugin_name}`,
-                            "__init__.py"
-                          ),
-                          INIT_TEMPLATE
-                        );
-                        // Create manual.html file...
-                        mkdf.create(
-                          join(
-                            `${plugin_path}`,
-                            `${plugin_name}`,
-                            "/manual.html"
-                          )
-                        );
-                        writeFileSync(
-                          join(
-                            `${plugin_path}`,
-                            `${plugin_name}`,
-                            "/manual.html"
-                          ),
-                          MANUAL_TEMPLATE
-                        );
+                        mkdf.create(desktop_file);
+                        writeFileSync(desktop_file, desktop_template);
+
+                        const folder = join(plugin_path, plugin_name);
+
+                        const py_file = join(folder, `${plugin_name}.py`);
+                        mkdf.create(py_file);
+                        writeFileSync(py_file, plugin_template);
+
+                        const init_file = join(folder, "__init__.py");
+                        mkdf.create(init_file);
+                        writeFileSync(init_file, init_template);
+
+                        const manual_file = join(folder, "/manual.html");
+                        mkdf.create(manual_file);
+                        writeFileSync(manual_file, manual_template);
+
                         vscode.window.showInformationMessage(
-                          `Krita script ${plugin_name} successfully created at ${plugin_path}`
+                          `Krita script ${plugin_name} successfully created at ${folder}`
                         );
                         // IDEA: logged by salapati @ 2018-4-3 15:55:57
                         // prompt to open folder on completion
+                        // vscode.window
+                        //   .showQuickPick([
+                        //     `open ${plugin_name} in current window`,
+                        //     `open ${plugin_name} in new window`,
+                        //     "Don't open!"
+                        //   ])
+                        //   .then(choice => {
+                        //     console.log(choice);
+                        //   });
                       });
                   });
               });

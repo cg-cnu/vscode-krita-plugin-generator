@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=${plugin_name}
+X-Python-2-Compatible=false
+X-Krita-Manual=manual.html
+Name=${plugin_name}
+Comment=${plugin_comment}
