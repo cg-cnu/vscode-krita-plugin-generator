@@ -1,7 +1,7 @@
 {
-    "name": "vscode-krita-extension-templates",
-    "displayName": "vscode-krita-extension-templates",
-    "description": "create krita extension templates from vscode",
+    "name": "vscode-krita-script-generator",
+    "displayName": "vscode-krita-script-generator",
+    "description": "Generate krita script templates from vscode",
     "version": "0.0.1",
     "publisher": "cg-cnu",
     "engines": {
@@ -18,7 +18,7 @@
         "commands": [
             {
                 "command": "krita.create",
-                "title": "Krita Extension Template"
+                "title": "Krita Script Generator"
             }
         ]
     },
