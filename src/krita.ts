@@ -6,7 +6,7 @@ import * as mkdf from "node-mkdirfilep";
 
 export function activate(context: vscode.ExtensionContext) {
   console.log(
-    'Congratulations, your extension "vscode-krita-extension-templates" is now active!'
+    'Congratulations, your extension "vscode-krita-plugin-generator" is now active!'
   );
 
   let create = vscode.commands.registerCommand("krita.create", () => {
@@ -14,17 +14,17 @@ export function activate(context: vscode.ExtensionContext) {
       .showInputBox({
         ignoreFocusOut: true,
         placeHolder: "Path...",
-        prompt: "Enter the path where the extension has to be created"
+        prompt: "Enter the path where the plugin has to be created!"
       })
-      .then(script_path => {
-        if (!script_path) {
+      .then(plugin_path => {
+        if (!plugin_path) {
           return;
         }
         // TODO: created by salapati @ 2018-4-3 15:26:34
         // make sure the path is valid
-        if (!existsSync(script_path) || !lstatSync(script_path).isDirectory()) {
+        if (!existsSync(plugin_path) || !lstatSync(plugin_path).isDirectory()) {
           vscode.window.showErrorMessage(
-            `Given directory '${script_path}' dosen't exist!`
+            `Given directory '${plugin_path}' dosen't exist!`
           );
           return;
         }
@@ -33,17 +33,17 @@ export function activate(context: vscode.ExtensionContext) {
           .showInputBox({
             ignoreFocusOut: true,
             placeHolder: "Name here...",
-            prompt: "Enter the name of the script"
+            prompt: "Enter the name of the plugin!"
           })
-          .then(script_name => {
-            if (!script_name) {
+          .then(plugin_name => {
+            if (!plugin_name) {
               return;
             }
-            var script_name = script_name.replace(/[^a-zA-Z ]/g, "");
+            var plugin_name = plugin_name.replace(/[^a-zA-Z ]/g, "");
             // make sure that path dosen't contain the script name already
-            if (existsSync(join(script_path, script_name))) {
+            if (existsSync(join(plugin_path, plugin_name))) {
               vscode.window.showErrorMessage(
-                `A script file already exists in the path '${script_path}'`
+                `A plugin already exists in the path '${plugin_path}'`
               );
               return;
             }
@@ -51,33 +51,33 @@ export function activate(context: vscode.ExtensionContext) {
               .showInputBox({
                 ignoreFocusOut: true,
                 placeHolder: "Description here...",
-                prompt: `Enter the descriptions for the script `
+                prompt: `Enter the descriptions for the plugin!`
               })
-              .then(script_comment => {
-                if (!script_comment) {
-                  script_comment = script_name;
+              .then(plugin_comment => {
+                if (!plugin_comment) {
+                  plugin_comment = plugin_name;
                 }
                 vscode.window
                   .showInputBox({
                     ignoreFocusOut: true,
                     placeHolder: "Menu entry here...",
-                    prompt: "Enter the menu entry of the script"
+                    prompt: "Enter the menu entry of the plugin!"
                   })
                   .then(menu_entry => {
                     if (!menu_entry) {
-                      menu_entry = script_name;
+                      menu_entry = plugin_name;
                     }
-                    const scriptTypes = ["Extension", "Docker"];
+                    const plugin_types = ["Extension", "Docker"];
                     vscode.window
-                      .showQuickPick(scriptTypes)
-                      .then(scriptType => {
-                        // const class_name = script_name.upper();
-                        const class_name = script_name;
-                        var script_template = "";
-                        if (scriptType === "Extension") {
-                          script_template = `from krita import Extension
+                      .showQuickPick(plugin_types)
+                      .then(plugin_type => {
+                        // const class_name = plugin_name.upper();
+                        const class_name = plugin_name;
+                        var plugin_template = "";
+                        if (plugin_type === "Extension") {
+                          plugin_template = `from krita import Extension
 
-EXTENSION_ID = 'pykrita_${script_name}'
+EXTENSION_ID = 'pykrita_${plugin_name}'
 MENU_ENTRY = '${menu_entry}'
 
 class ${class_name}(Extension):
@@ -100,11 +100,11 @@ app=Krita.instance()
 extension=${class_name}(parent=app) #instantiate your class
 app.addExtension(extension)`;
                         }
-                        if (scriptType === "Docker") {
-                          script_template = `from krita import DockWidget, DockWidgetFactory, DockWidgetFactoryBase
+                        if (plugin_type === "Docker") {
+                          plugin_template = `from krita import DockWidget, DockWidgetFactory, DockWidgetFactoryBase
 
-DOCKER_NAME = '${script_name}'
-DOCKER_ID = 'pyKrita_${script_name}'
+DOCKER_NAME = '${plugin_name}'
+DOCKER_ID = 'pyKrita_${plugin_name}'
 
 class ${class_name}(DockWidget):
 
@@ -125,23 +125,23 @@ instance.addDockWidgetFactory(dock_widget_factory)`;
                         let DESKTOP_TEMPLATE = `[Desktop Entry]
 Type=Service
 ServiceTypes=Krita/PythonPlugin
-X-KDE-Library=${script_name}
+X-KDE-Library=${plugin_name}
 X-Python-2-Compatible=false
 X-Krita-Manual=manual.html
-Name=${script_name}
-Comment=${script_comment}`;
+Name=${plugin_name}
+Comment=${plugin_comment}`;
 
-                        let INIT_TEMPLATE = `from .${script_name} import *`;
+                        let INIT_TEMPLATE = `from .${plugin_name} import *`;
 
                         let MANUAL_TEMPLATE = `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <!--BBD's Krita Script Starter, Feb 2018 -->
-<head><title>${script_name}</title>
+<head><title>${plugin_name}</title>
 </head>
 <body>
-<h3>${script_name}</h3>
+<h3>${plugin_name}</h3>
 Tell people about what your script does here. This is an html document so you can format it with html tags.
 <h3>Usage</h3>
 Tell people how to use your script here. 
@@ -150,42 +150,42 @@ Tell people how to use your script here.
 </html>`;
                         //create .desktop file...
                         mkdf.create(
-                          join(`${script_path}`, `${script_name}.desktop`)
+                          join(`${plugin_path}`, `${plugin_name}.desktop`)
                         );
                         // write contents...
                         writeFileSync(
-                          join(`${script_path}`, `${script_name}.desktop`),
+                          join(`${plugin_path}`, `${plugin_name}.desktop`),
                           DESKTOP_TEMPLATE
                         );
                         // create main script file...
                         mkdf.create(
                           join(
-                            `${script_path}`,
-                            `${script_name}`,
-                            `${script_name}.py`
+                            `${plugin_path}`,
+                            `${plugin_name}`,
+                            `${plugin_name}.py`
                           )
                         );
                         // write files to disk
                         writeFileSync(
                           join(
-                            `${script_path}`,
-                            `${script_name}`,
-                            `${script_name}.py`
+                            `${plugin_path}`,
+                            `${plugin_name}`,
+                            `${plugin_name}.py`
                           ),
-                          script_template
+                          plugin_template
                         );
                         // Create __init__.py file...
                         mkdf.create(
                           join(
-                            `${script_path}`,
-                            `${script_name}`,
+                            `${plugin_path}`,
+                            `${plugin_name}`,
                             "__init__.py"
                           )
                         );
                         writeFileSync(
                           join(
-                            `${script_path}`,
-                            `${script_name}`,
+                            `${plugin_path}`,
+                            `${plugin_name}`,
                             "__init__.py"
                           ),
                           INIT_TEMPLATE
@@ -193,22 +193,24 @@ Tell people how to use your script here.
                         // Create manual.html file...
                         mkdf.create(
                           join(
-                            `${script_path}`,
-                            `${script_name}`,
+                            `${plugin_path}`,
+                            `${plugin_name}`,
                             "/manual.html"
                           )
                         );
                         writeFileSync(
                           join(
-                            `${script_path}`,
-                            `${script_name}`,
+                            `${plugin_path}`,
+                            `${plugin_name}`,
                             "/manual.html"
                           ),
                           MANUAL_TEMPLATE
                         );
                         vscode.window.showInformationMessage(
-                          `Krita script ${script_name} successfully created at ${script_path}`
+                          `Krita script ${plugin_name} successfully created at ${plugin_path}`
                         );
+                        // IDEA: logged by salapati @ 2018-4-3 15:55:57
+                        // prompt to open folder on completion
                       });
                   });
               });

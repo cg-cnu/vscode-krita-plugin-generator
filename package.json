@@ -1,7 +1,7 @@
 {
-    "name": "vscode-krita-script-generator",
-    "displayName": "vscode-krita-script-generator",
-    "description": "Generate krita script templates from vscode",
+    "name": "vscode-krita-plugin-generator",
+    "displayName": "vscode-krita-plugin-generator",
+    "description": "Generate krita plugin templates from vscode",
     "version": "0.0.1",
     "publisher": "cg-cnu",
     "engines": {
@@ -18,7 +18,7 @@
         "commands": [
             {
                 "command": "krita.create",
-                "title": "Krita Script Generator"
+                "title": "Krita plugin Generator"
             }
         ]
     },

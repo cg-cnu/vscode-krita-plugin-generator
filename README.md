@@ -1,1 +1,1 @@
-# vscode-krita-script-generator
+# vscode-krita-plugin-generator
