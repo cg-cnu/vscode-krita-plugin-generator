@@ -17,4 +17,4 @@ dock_widget_factory = DockWidgetFactory(DOCKER_ID,
     DockWidgetFactoryBase.DockRight, 
     ${class_name})
 
-instance.addDockWidgetFactory(dock_widget_factory);
+instance.addDockWidgetFactory(dock_widget_factory)
