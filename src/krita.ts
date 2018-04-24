@@ -117,7 +117,9 @@ export function activate(context: vscode.ExtensionContext) {
                           ? plugin_type.toLowerCase()
                           : "extension";
                         const class_name = capitalizeFirstLetter(plugin_name);
-
+                        // HACK: Temporary fix -@salapati at 2018-4-24 10:53:22
+                        // TS is complaining about un used variable
+                        console.log(class_name);
                         // Get templates
                         let plugin_template = eval(
                           "`" + getTemplate(`${plugin}.py`) + "`"
