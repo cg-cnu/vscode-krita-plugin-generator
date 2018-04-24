@@ -10,6 +10,23 @@
     "categories": [
         "Other"
     ],
+    "author": {
+        "name": "sreenivas alapati",
+        "email": "sreenivas9alapati@gmail.com",
+        "url": "http://twitter.com/cgcnu"
+    },
+    "bugs": {
+        "email": "sreenivas9alapati@gmail.com",
+        "url": "https://github.com/cg-cnu/vscode-krita-plugin-generator/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cg-cnu/vscode-krita-plugin-generator"
+    },
+    "readme": "README.md",
+    "homepage": "https://github.com/cg-cnu/vscode-krita-plugin-generator",
+    "icon": "icons/krita_icon.jpg",
+    "license": "MIT",
     "activationEvents": [
         "onCommand:krita.create"
     ],
