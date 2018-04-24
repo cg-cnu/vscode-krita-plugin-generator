@@ -9,7 +9,7 @@ function capitalizeFirstLetter(text: string) {
 }
 
 function getTemplate(fileName: string) {
-  const template_path = join(__dirname, "..", "src", "templates");
+  const template_path = join(__dirname, "..", "templates");
   return readFileSync(join(template_path, fileName), "utf8");
 }
 
