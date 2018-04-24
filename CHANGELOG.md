@@ -10,3 +10,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.2]
 - Changed marketplace display name
 - added tags
+
+## [0.0.5]
+- Fixed the issues in python extension template
+- Tested and validated that its working in krita
