@@ -6,3 +6,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [0.0.1]
 - Create template for python plugin
 - Create extensions and dockers
+
+## [0.0.2]
+- Changed marketplace display name
+- added tags
