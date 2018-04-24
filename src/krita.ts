@@ -58,12 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
             if (!orig_plugin_name) {
               return;
             }
-            var plugin_name = orig_plugin_name.replace(/[^a-zA-Z0-9]/g, "");
-            if (orig_plugin_name !== plugin_name) {
-              vscode.window.showInformationMessage(
-                `Plugin name changed from '${orig_plugin_name}' to '${plugin_name}'`
-              );
-            }
+            var plugin_name = orig_plugin_name.replace(/[^a-zA-Z0-9]/g, "_");
             if (existsSync(join(plugin_path, plugin_name))) {
               vscode.window.showErrorMessage(
                 `A plugin already exists in the path '${plugin_path}' with name '${plugin_name}'`
