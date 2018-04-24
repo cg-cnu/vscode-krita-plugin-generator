@@ -9,7 +9,7 @@
     "generator",
     "python"
   ],
-  "version": "0.0.4",
+  "version": "0.0.5",
   "publisher": "cg-cnu",
   "engines": {
     "vscode": "^1.21.0"
