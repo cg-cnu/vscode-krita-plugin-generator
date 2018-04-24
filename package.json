@@ -1,59 +1,66 @@
 {
-    "name": "vscode-krita-plugin-generator",
-    "displayName": "vscode-krita-plugin-generator",
-    "description": "Generate krita plugin templates from vscode",
-    "version": "0.0.1",
-    "publisher": "cg-cnu",
-    "engines": {
-        "vscode": "^1.21.0"
-    },
-    "categories": [
-        "Other"
-    ],
-    "author": {
-        "name": "sreenivas alapati",
-        "email": "sreenivas9alapati@gmail.com",
-        "url": "http://twitter.com/cgcnu"
-    },
-    "bugs": {
-        "email": "sreenivas9alapati@gmail.com",
-        "url": "https://github.com/cg-cnu/vscode-krita-plugin-generator/issues"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/cg-cnu/vscode-krita-plugin-generator"
-    },
-    "readme": "README.md",
-    "homepage": "https://github.com/cg-cnu/vscode-krita-plugin-generator",
-    "icon": "icons/krita_icon.jpg",
-    "license": "MIT",
-    "activationEvents": [
-        "onCommand:krita.create"
-    ],
-    "main": "./out/krita",
-    "contributes": {
-        "commands": [
-            {
-                "command": "krita.create",
-                "title": "Krita plugin Generator"
-            }
-        ]
-    },
-    "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "npm run compile && node ./node_modules/vscode/bin/test"
-    },
-    "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
-        "tslint": "^5.8.0",
-        "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
-    },
-    "dependencies": {
-        "node-mkdirfilep": "0.0.2"
-    }
+  "name": "vscode-krita-plugin-generator",
+  "displayName": "Krita plugin generator",
+  "description": "Generate krita plugin templates from vscode",
+  "keywords": [
+    "krita",
+    "template",
+    "photoshop",
+    "generator",
+    "python"
+  ],
+  "version": "0.0.2",
+  "publisher": "cg-cnu",
+  "engines": {
+    "vscode": "^1.21.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "author": {
+    "name": "sreenivas alapati",
+    "email": "sreenivas9alapati@gmail.com",
+    "url": "http://twitter.com/cgcnu"
+  },
+  "bugs": {
+    "email": "sreenivas9alapati@gmail.com",
+    "url": "https://github.com/cg-cnu/vscode-krita-plugin-generator/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cg-cnu/vscode-krita-plugin-generator"
+  },
+  "readme": "README.md",
+  "homepage": "https://github.com/cg-cnu/vscode-krita-plugin-generator",
+  "icon": "icons/krita_icon.jpg",
+  "license": "MIT",
+  "activationEvents": [
+    "onCommand:krita.create"
+  ],
+  "main": "./out/krita",
+  "contributes": {
+    "commands": [
+      {
+        "command": "krita.create",
+        "title": "Krita plugin Generator"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "test": "npm run compile && node ./node_modules/vscode/bin/test"
+  },
+  "devDependencies": {
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.6",
+    "tslint": "^5.8.0",
+    "@types/node": "^7.0.43",
+    "@types/mocha": "^2.2.42"
+  },
+  "dependencies": {
+    "node-mkdirfilep": "0.0.2"
+  }
 }
