@@ -112,17 +112,17 @@ export function activate(context: vscode.ExtensionContext) {
                           vscode.window.showInformationMessage(
                             "No plugin type choosen. Defaulting to Extension!"
                           );
+                          plugin_type = 'extension';
+                        }else{
+                          plugin_type = plugin_type.toLowerCase();
                         }
-                        const plugin = plugin_type
-                          ? plugin_type.toLowerCase()
-                          : "extension";
                         const class_name = capitalizeFirstLetter(plugin_name);
                         // HACK: Temporary fix -@salapati at 2018-4-24 10:53:22
-                        // TS is complaining about un used variable
+                        // TS is complaining about unused variable
                         console.log(class_name);
                         // Get templates
                         let plugin_template = eval(
-                          "`" + getTemplate(`${plugin}.py`) + "`"
+                          "`" + getTemplate(`${plugin_type}.py`) + "`"
                         );
                         let desktop_template = eval(
                           "`" + getTemplate("script.desktop") + "`"
