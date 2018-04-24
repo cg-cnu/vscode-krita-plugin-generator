@@ -3,5 +3,6 @@ All notable changes to the "vscode-krita-extension-templates" extension will be 
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
-- Initial release
+## [0.0.1]
+- Create template for python plugin
+- Create extensions and dockers
