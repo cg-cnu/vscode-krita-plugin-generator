@@ -107,8 +107,8 @@ export function activate(context: vscode.ExtensionContext) {
                           vscode.window.showInformationMessage(
                             "No plugin type choosen. Defaulting to Extension!"
                           );
-                          plugin_type = 'extension';
-                        }else{
+                          plugin_type = "extension";
+                        } else {
                           plugin_type = plugin_type.toLowerCase();
                         }
                         const class_name = capitalizeFirstLetter(plugin_name);
