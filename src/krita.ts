@@ -15,7 +15,7 @@ function getTemplate(fileName: string) {
 
 function openCode(path: string, newWindow: boolean) {
   if (existsSync(path)) {
-    let repoUri: vscode.Uri = vscode.Uri.parse(path);
+    let repoUri: vscode.Uri = vscode.Uri.file(path);
     vscode.commands
       .executeCommand("vscode.openFolder", repoUri, newWindow)
       .then(
