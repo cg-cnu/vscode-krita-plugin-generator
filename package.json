@@ -54,10 +54,10 @@
     "test": "npm run compile && node ./node_modules/vscode/bin/test"
   },
   "devDependencies": {
-    "typescript": "^3.4.3",
-    "vscode": "^1.1.33",
-    "@types/node": "^11.13.2",
-    "@types/mocha": "^5.2.6"
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^11.15.12",
+    "typescript": "^3.8.3",
+    "vscode": "^1.1.37"
   },
   "dependencies": {
     "node-mkdirfilep": "0.0.2"
